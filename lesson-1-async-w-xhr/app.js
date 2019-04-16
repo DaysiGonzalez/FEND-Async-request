@@ -10,6 +10,29 @@
         responseContainer.innerHTML = '';
         searchedForText = searchField.value;
 
+        const articleRequest = new XMLHttpRequest();
+        articleRequest.onload = addArticles;
+        articleRequest.open('GET', `http://api.nytimes.com/svc/search/v2/articlesearch.json?q=${searchedForText}&api-key=N45edRsQrGMn76AaxbuBYppDEYyVHGkS`);
+        articleRequest.send();
+
+        function addArticles () {
+          let htmlContent = '';
+          const data = JSON.parse(this.responseText);
+          console.log(data);
+          if(data.response && data.response.docs && data.response.docs.length > 1){
+            htmlContent = '<ul>' + data.response.docs.map(article => `<li class ="article">
+              <h2><a href ="${article.web_url}">${article.headline.main}</a></h2>
+              <p>${article.snippet}</p>
+            </li>`
+            ).join('') + '</lu>';
+          } else {
+            htmlContent = '<div class="error-no-image">No articles available</div>';
+          }
+
+          responseContainer.insertAdjacentHTML('afterbegin', htmlContent);
+
+        };
+
         const unsplashRequest = new XMLHttpRequest();
 
         unsplashRequest.open('GET', `https://api.unsplash.com/search/photos?page=1&query=${searchedForText}`);
@@ -32,10 +55,7 @@
           }
 
           responseContainer.insertAdjacentHTML('afterbegin', htmlContent);
-        }
+        };
     });
-
-
-
 
 })();
